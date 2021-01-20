@@ -1,0 +1,6 @@
+com\hska\avg\versicherungsantrag\InformationEinholenDelegate.class
+com\hska\avg\versicherungsantrag\ProcessConstants.class
+com\hska\avg\versicherungsantrag\CamundaBpmProcessApplication.class
+com\hska\avg\versicherungsantrag\LoggerDelegate.class
+com\hska\avg\versicherungsantrag\RisikobewertungUebernehmenDelegate.class
+com\hska\avg\versicherungsantrag\CheckClientDelegate.class

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_153s5ym" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.5.0">
+  <bpmn:process id="versicherungsantrag" name="VersicherungTeil1" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="vorname" label="Vorname" type="string" />
+          <camunda:formField id="name" label="Name" type="string" />
+          <camunda:formField id="geburtsdatum" label="Geburtsdatum" type="date" />
+          <camunda:formField id="produkt" label="Produkt" type="string" />
+          <camunda:formField id="versicherungssumme" label="Versicherungssumme" type="long" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_14w0i0v</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_14w0i0v" sourceRef="StartEvent_1" targetRef="information_einholen" />
+    <bpmn:serviceTask id="information_einholen" name="Information einholen" camunda:class="com.hska.avg.versicherungsantrag.InformationEinholenDelegate">
+      <bpmn:incoming>Flow_14w0i0v</bpmn:incoming>
+      <bpmn:outgoing>Flow_0i3ql9j</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="risiko_bewerten" name="Risiko bewerten">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="vorname" label="Vorname" type="string" defaultValue="#{vorname}" />
+          <camunda:formField id="name" label="Name" type="string" defaultValue="#{name}" />
+          <camunda:formField id="geburtsdatum" type="date" />
+          <camunda:formField id="produkt" label="Produkt" type="string" defaultValue="#{produkt}" />
+          <camunda:formField id="versicherungssumme" label="Versicherungssumme" type="long" defaultValue="#{versicherungssumme}" />
+          <camunda:formField id="risiko" label="Risiko" type="long" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0adp1sw</bpmn:incoming>
+      <bpmn:outgoing>Flow_0gsu8rh</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0gsu8rh" sourceRef="risiko_bewerten" targetRef="risikobewertung_speichern" />
+    <bpmn:serviceTask id="risikobewertung_speichern" name="Risikobewertung speichern" camunda:class="com.hska.avg.versicherungsantrag.RisikobewertungSpeichernDelegate">
+      <bpmn:incoming>Flow_0gsu8rh</bpmn:incoming>
+      <bpmn:outgoing>Flow_1dv758m</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_1ye5v2d" name="Neukunde">
+      <bpmn:incoming>Flow_0i3ql9j</bpmn:incoming>
+      <bpmn:outgoing>Flow_16fp71g</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0cv3vtv</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0i3ql9j" sourceRef="information_einholen" targetRef="Gateway_1ye5v2d" />
+    <bpmn:sequenceFlow id="Flow_16fp71g" name="ja" sourceRef="Gateway_1ye5v2d" targetRef="Gateway_0iyfqtp">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{neukunde}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0cv3vtv" name="nein" sourceRef="Gateway_1ye5v2d" targetRef="Event_1b823lo">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{!neukunde}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="Event_1b823lo">
+      <bpmn:incoming>Flow_1dv758m</bpmn:incoming>
+      <bpmn:incoming>Flow_0cv3vtv</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1dv758m" sourceRef="risikobewertung_speichern" targetRef="Event_1b823lo" />
+    <bpmn:sequenceFlow id="Flow_1v6a7l8" sourceRef="Event_16z8y24" targetRef="Activity_0wf2m3h" />
+    <bpmn:endEvent id="Event_0p9cg38">
+      <bpmn:incoming>Flow_0wpbb9h</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0wpbb9h" sourceRef="Activity_0wf2m3h" targetRef="Event_0p9cg38" />
+    <bpmn:exclusiveGateway id="Gateway_0iyfqtp">
+      <bpmn:incoming>Flow_1dfdevn</bpmn:incoming>
+      <bpmn:incoming>Flow_16fp71g</bpmn:incoming>
+      <bpmn:outgoing>Flow_0adp1sw</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1dfdevn" sourceRef="Event_1okw3kt" targetRef="Gateway_0iyfqtp" />
+    <bpmn:sequenceFlow id="Flow_0adp1sw" sourceRef="Gateway_0iyfqtp" targetRef="risiko_bewerten" />
+    <bpmn:boundaryEvent id="Event_1okw3kt" attachedToRef="information_einholen">
+      <bpmn:outgoing>Flow_1dfdevn</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1jjrcbb" errorRef="Error_0sjgsha" camunda:errorCodeVariable="kundenverwaltungErrorCode" camunda:errorMessageVariable="kundenverwaltungErrorMessage" />
+    </bpmn:boundaryEvent>
+    <bpmn:sendTask id="Activity_0wf2m3h" name="vorgesetze benachrichtigen" camunda:class="com.hska.avg.versicherungsantrag.VorgesetzteBenachrichtigenDelegate">
+      <bpmn:incoming>Flow_1v6a7l8</bpmn:incoming>
+      <bpmn:outgoing>Flow_0wpbb9h</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:boundaryEvent id="Event_16z8y24" cancelActivity="false" attachedToRef="risiko_bewerten">
+      <bpmn:outgoing>Flow_1v6a7l8</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1ca4e87">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT24H</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+  </bpmn:process>
+  <bpmn:error id="Error_0sjgsha" name="kundenverwaltung_fehler" errorCode="kundenverwaltungError" camunda:errorMessage="Kundenverwaltung nicht verfuegbar" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="versicherungsantrag">
+      <bpmndi:BPMNEdge id="Flow_0adp1sw_di" bpmnElement="Flow_0adp1sw">
+        <di:waypoint x="455" y="170" />
+        <di:waypoint x="630" y="170" />
+        <di:waypoint x="630" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dfdevn_di" bpmnElement="Flow_1dfdevn">
+        <di:waypoint x="290" y="232" />
+        <di:waypoint x="290" y="170" />
+        <di:waypoint x="405" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wpbb9h_di" bpmnElement="Flow_0wpbb9h">
+        <di:waypoint x="780" y="100" />
+        <di:waypoint x="842" y="100" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1v6a7l8_di" bpmnElement="Flow_1v6a7l8">
+        <di:waypoint x="705" y="240" />
+        <di:waypoint x="730" y="240" />
+        <di:waypoint x="730" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dv758m_di" bpmnElement="Flow_1dv758m">
+        <di:waypoint x="910" y="290" />
+        <di:waypoint x="992" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0cv3vtv_di" bpmnElement="Flow_0cv3vtv">
+        <di:waypoint x="430" y="315" />
+        <di:waypoint x="430" y="390" />
+        <di:waypoint x="1010" y="390" />
+        <di:waypoint x="1010" y="308" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="489" y="372" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16fp71g_di" bpmnElement="Flow_16fp71g">
+        <di:waypoint x="430" y="265" />
+        <di:waypoint x="430" y="195" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="416" y="223" width="8" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0i3ql9j_di" bpmnElement="Flow_0i3ql9j">
+        <di:waypoint x="310" y="290" />
+        <di:waypoint x="405" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0gsu8rh_di" bpmnElement="Flow_0gsu8rh">
+        <di:waypoint x="710" y="290" />
+        <di:waypoint x="810" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14w0i0v_di" bpmnElement="Flow_14w0i0v">
+        <di:waypoint x="168" y="290" />
+        <di:waypoint x="210" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="132" y="272" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dnr64b_di" bpmnElement="information_einholen">
+        <dc:Bounds x="210" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0cuh4m0_di" bpmnElement="risiko_bewerten">
+        <dc:Bounds x="610" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1sclbg6_di" bpmnElement="risikobewertung_speichern">
+        <dc:Bounds x="810" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1ye5v2d_di" bpmnElement="Gateway_1ye5v2d" isMarkerVisible="true">
+        <dc:Bounds x="405" y="265" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="464" y="283" width="51" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1b823lo_di" bpmnElement="Event_1b823lo">
+        <dc:Bounds x="992" y="272" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0p9cg38_di" bpmnElement="Event_0p9cg38">
+        <dc:Bounds x="842" y="82" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0iyfqtp_di" bpmnElement="Gateway_0iyfqtp" isMarkerVisible="true">
+        <dc:Bounds x="405" y="145" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_07fgdni_di" bpmnElement="Activity_0wf2m3h">
+        <dc:Bounds x="680" y="60" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0k67edm_di" bpmnElement="Event_16z8y24">
+        <dc:Bounds x="672" y="232" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_179thpu_di" bpmnElement="Event_1okw3kt">
+        <dc:Bounds x="272" y="232" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="245" y="275" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
