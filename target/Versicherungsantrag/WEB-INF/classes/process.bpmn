@@ -28,6 +28,7 @@
           <camunda:formField id="versicherungssumme" label="Versicherungssumme" type="long" defaultValue="#{versicherungssumme}" />
           <camunda:formField id="risiko" label="Risiko" type="long" />
         </camunda:formData>
+        <camunda:taskListener class="com.hska.avg.versicherungsantrag.TaskAssignmentListener" event="assignment" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0adp1sw</bpmn:incoming>
       <bpmn:outgoing>Flow_0gsu8rh</bpmn:outgoing>
@@ -70,16 +71,35 @@
       <bpmn:outgoing>Flow_1dfdevn</bpmn:outgoing>
       <bpmn:errorEventDefinition id="ErrorEventDefinition_1jjrcbb" errorRef="Error_0sjgsha" camunda:errorCodeVariable="kundenverwaltungErrorCode" camunda:errorMessageVariable="kundenverwaltungErrorMessage" />
     </bpmn:boundaryEvent>
-    <bpmn:sendTask id="Activity_0wf2m3h" name="vorgesetze benachrichtigen" camunda:class="com.hska.avg.versicherungsantrag.VorgesetzteBenachrichtigenDelegate">
-      <bpmn:incoming>Flow_1v6a7l8</bpmn:incoming>
-      <bpmn:outgoing>Flow_0wpbb9h</bpmn:outgoing>
-    </bpmn:sendTask>
     <bpmn:boundaryEvent id="Event_16z8y24" cancelActivity="false" attachedToRef="risiko_bewerten">
       <bpmn:outgoing>Flow_1v6a7l8</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_1ca4e87">
         <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1M</bpmn:timeDuration>
       </bpmn:timerEventDefinition>
     </bpmn:boundaryEvent>
+    <bpmn:userTask id="Activity_0wf2m3h" name="Bearbeitung beschleunigen">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="sachbearbeiter" label="Sachberarbeiter" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" config="true" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="name" label="Kunde Name" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" config="true" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="vorname" label="Kunde Vorname" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" config="true" />
+            </camunda:validation>
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1v6a7l8</bpmn:incoming>
+      <bpmn:outgoing>Flow_0wpbb9h</bpmn:outgoing>
+    </bpmn:userTask>
   </bpmn:process>
   <bpmn:error id="Error_0sjgsha" name="kundenverwaltung_fehler" errorCode="kundenverwaltungError" camunda:errorMessage="Kundenverwaltung nicht verfuegbar" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -150,7 +170,7 @@
       <bpmndi:BPMNShape id="Gateway_1ye5v2d_di" bpmnElement="Gateway_1ye5v2d" isMarkerVisible="true">
         <dc:Bounds x="405" y="265" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="454" y="283" width="51" height="14" />
+          <dc:Bounds x="464" y="283" width="51" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1b823lo_di" bpmnElement="Event_1b823lo">
@@ -162,17 +182,17 @@
       <bpmndi:BPMNShape id="Gateway_0iyfqtp_di" bpmnElement="Gateway_0iyfqtp" isMarkerVisible="true">
         <dc:Bounds x="405" y="145" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_07fgdni_di" bpmnElement="Activity_0wf2m3h">
+      <bpmndi:BPMNShape id="Activity_1cz6hj3_di" bpmnElement="Activity_0wf2m3h">
         <dc:Bounds x="680" y="60" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0k67edm_di" bpmnElement="Event_16z8y24">
+        <dc:Bounds x="672" y="232" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_179thpu_di" bpmnElement="Event_1okw3kt">
         <dc:Bounds x="272" y="232" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="245" y="275" width="90" height="27" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0k67edm_di" bpmnElement="Event_16z8y24">
-        <dc:Bounds x="672" y="232" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
